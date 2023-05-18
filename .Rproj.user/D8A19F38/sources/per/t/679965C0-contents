@@ -1,0 +1,154 @@
+# A function to run a specific simulation condition
+# Var: A vector; selected variance component
+# Ped: A dataframe; selected pedigree structure
+# data_ini: a file path-the initializing Rdata file containing the pedigrees and variance combinations for simulation
+# path_results: a path of the folder indicating the place for storing the simulation results.
+RunSim <- function(Var, Ped, path_results){
+    source("~/R-Project/mtDNA_mt2/Functions/HelperFunctions.R")
+    library(OpenMx)
+    library(mvtnorm)
+    
+    Addmat <- as.matrix(ped2add(Ped, verbose = TRUE))
+    Nucmat <- ped2cn(sampleFam)
+    Extmat <- ped2ce(sampleFam)
+    Mtdmat <- ped2mt_v3(sampleFam)
+    Envmat <- diag(1,nrow = nrow(Addmat))
+    dimnames(Envmat) <- dimnames(Addmat)
+    Amimat <- Addmat*Mtdmat
+    Dmgmat <- Addmat*Addmat
+    
+    #Var Comb
+    ad2 <- Var[2]
+    dd2 <- Var[3]
+    cn2 <- Var[4]
+    ce2 <- Var[5]
+    mt2 <- Var[6]
+    am2 <- Var[7]
+    ee2 <- Var[8]
+    
+    ## generate data
+    sumCov <- ad2[comb]*Addmat + dd2[comb]*Addmat*Addmat + cn2[comb]*Nucmat + ce2[comb]*Extmat + mt2[comb]*Mtdmat + am2[comb]*Addmat*Mtdmat + ee2[comb]*Envmat
+    set.seed(14271)
+    numfam <- round(10000/nrow(Addmat))
+    dat <- rmvnorm(numfam, sigma = sumCov)
+    
+    totalVar <- 1
+    totalMea <- 0
+    
+    ObjectsKeep <- as.character(ls())
+    
+    ## the full model
+    Model1a <- mxModel(
+        "ModelOne",
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ad2[comb]*totalVar, labels = "vad", name = "Vad", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = dd2[comb]*totalVar, labels = "vdd", name = "Vdd", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = cn2[comb]*totalVar, labels = "vcn", name = "Vcn", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ce2[comb]*totalVar, labels = "vce", name = "Vce", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = mt2[comb]*totalVar, labels = "vmt", name = "Vmt", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = am2[comb]*totalVar, labels = "vam", name = "Vam", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ee2[comb]*totalVar, labels = "ver", name = "Ver", lbound = 1e-10)
+    )
+    
+    ll <- list()
+    for (i in 1:numfam){
+        ll[[i]] <- dat[i,]
+    }
+    
+    modList <- list()
+    modNames <- paste0("fam", 1:numfam)
+    
+    for(afam in 1:numfam){
+        ytemp <- paste('S', rownames (Addmat))
+        fsize <- nrow(Addmat)
+        modList[[afam]] <- mxModel(name=modNames[afam],
+                                   mxMatrix("Iden", nrow=fsize, ncol=fsize, name="I"), 
+                                   mxMatrix("Unit", nrow=fsize, ncol=fsize, name='U'),
+                                   mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Addmat, name="A"), 
+                                   #mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Dmgmat, name="D"), 
+                                   mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Nucmat, name="Cn"), 
+                                   mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Extmat, name="Ce"), 
+                                   #mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Amimat, name="Am"), 
+                                   mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Mtdmat, name="Mt"),
+                                   mxData(observed = matrix(ll[[afam]], nrow=1, dimnames=list(NULL, ytemp)), type="raw", sort=FALSE),
+                                   mxMatrix('Full', nrow=1, ncol=fsize, name='M', free=TRUE, labels='meanLI',
+                                            dimnames=list(NULL, ytemp)),
+                                   mxAlgebra ((A %x% ModelOne.Vad) 
+                                              #+ (D %x% ModelOne.Vdd) 
+                                              + (Cn %x% ModelOne.Vcn) 
+                                              + (U %x% ModelOne.Vce) 
+                                              + (Mt %x% ModelOne.Vmt) 
+                                              #+ (Am %x% ModelOne.Vam) 
+                                              + (I %x% ModelOne.Ver), 
+                                              name="V", dimnames=list(ytemp, ytemp)),
+                                   mxExpectationNormal(covariance='V', means='M'), 
+                                   mxFitFunctionML()
+        )
+    }
+    container <- mxModel('Model1b', Model1a, modList, mxFitFunctionMultigroup(modNames))
+    container <- mxOption(container, 'Checkpoint Units', 'minutes')
+    container <- mxOption(container, 'Checkpoint Count', 1)
+    containerRun <- mxRun(container, intervals=FALSE, checkpoint=TRUE) 
+    
+    smr1 <- summary(containerRun)
+    
+    save.image(file = paste0(path_results,"/model1.RData"))
+    
+    rm(list = setdiff(ls(), c(ObjectsKeep, "ObjectsKeep", "smr1")))
+    
+    ##### Model excluding mt and am
+    
+    Model2a <- mxModel(
+        "ModelThree",
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ad2[comb]*totalVar, labels = "vad", name = "Vad", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = dd2[comb]*totalVar, labels = "vdd", name = "Vdd", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = cn2[comb]*totalVar, labels = "vcn", name = "Vcn", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ce2[comb]*totalVar, labels = "vce", name = "Vce", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = mt2[comb]*totalVar, labels = "vmt", name = "Vmt", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = am2[comb]*totalVar, labels = "vam", name = "Vam", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ee2[comb]*totalVar, labels = "ver", name = "Ver", lbound = 1e-10)
+    )
+    
+    ll2 <- list()
+    for (i in 1:numfam){
+        ll2[[i]] <- dat[i,]
+    }
+    
+    modList2 <- list()
+    modNames2 <- paste0("fam", 1:numfam)
+    
+    for(afam2 in 1:numfam){
+        ytemp2 <- paste('S', rownames (Addmat))
+        fsize2 <- nrow(Addmat)
+        modList2[[afam2]] <- mxModel(name=modNames2[afam2],
+                                     mxMatrix("Iden", nrow=fsize2, ncol=fsize2, name="I"), 
+                                     mxMatrix("Unit", nrow=fsize2, ncol=fsize2, name='U'),
+                                     mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Addmat, name="A"), 
+                                     #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Dmgmat, name="D"), 
+                                     mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Nucmat, name="Cn"), 
+                                     mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Extmat, name="Ce"), 
+                                     #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Amimat, name="Am"), 
+                                     #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Mtdmat, name="Mt"),
+                                     mxData(observed = matrix(ll2[[afam2]], nrow=1, dimnames=list(NULL, ytemp2)), type="raw", sort=FALSE),
+                                     mxMatrix('Full', nrow=1, ncol=fsize2, name='M', free=TRUE, labels='meanLI',
+                                              dimnames=list(NULL, ytemp2)),
+                                     mxAlgebra ((A %x% ModelThree.Vad) 
+                                                #+ (D %x% ModelThree.Vdd) 
+                                                + (Cn %x% ModelThree.Vcn) 
+                                                + (U %x% ModelThree.Vce) 
+                                                #+ (Mt %x% ModelThree.Vmt) 
+                                                #+ (Am %x% ModelThree.Vam) 
+                                                + (I %x% ModelThree.Ver), 
+                                                name="V", dimnames=list(ytemp2, ytemp2)),
+                                     mxExpectationNormal(covariance='V', means='M'), 
+                                     mxFitFunctionML()
+        )
+    }
+    container2 <- mxModel('Model2b', Model2a, modList2, mxFitFunctionMultigroup(modNames2))
+    container2 <- mxOption(container2, 'Checkpoint Units', 'minutes')
+    container2 <- mxOption(container2, 'Checkpoint Count', 1)
+    containerRun2 <- mxRun(container2, intervals=FALSE, checkpoint=TRUE) 
+    smr2 <- summary(containerRun2)
+    
+    save.image(file = paste0(path_results,"/model2.RData"))
+    rm(list = setdiff(ls(), c(ObjectsKeep,"ObjectsKeep", "smr1", "smr2")))
+}

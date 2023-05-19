@@ -20,10 +20,10 @@ RunSim <- function(Var, Ped, path_results){
     #Var Comb
     ad2 <- Var[[2]]
     #print(class(ad2))
-    dd2 <- Var[[3]]
-    cn2 <- Var[[4]]
-    ce2 <- Var[[5]]
-    mt2 <- Var[[6]]
+    cn2 <- Var[[3]]
+    ce2 <- Var[[4]]
+    mt2 <- Var[[5]]
+    dd2 <- Var[[6]]
     am2 <- Var[[7]]
     ee2 <- Var[[8]]
     
@@ -93,7 +93,9 @@ RunSim <- function(Var, Ped, path_results){
     
     smr1 <- summary(containerRun)
     
-    save.image(file = paste0(path_results,"/model1.RData"))
+    save(list = ls(envir = environment()), file = paste0(path_results,"/model1.RData"), envir = environment())
+    
+    #save.image(file = paste0(path_results,"/model1.RData"))
     
     rm(list = setdiff(ls(), c(ObjectsKeep, "ObjectsKeep", "smr1")))
     
@@ -151,10 +153,14 @@ RunSim <- function(Var, Ped, path_results){
     containerRun2 <- mxRun(container2, intervals=FALSE, checkpoint=TRUE) 
     smr2 <- summary(containerRun2)
     
-    save.image(file = paste0(path_results,"/model2.RData"))
+    #save.image(file = paste0(path_results,"/model2.RData"))
+    save(list = ls(envir = environment()), file = paste0(path_results,"/model2.RData"), envir = environment())
+    
     #rm(list = setdiff(ls(), c(ObjectsKeep,"ObjectsKeep", "smr1", "smr2")))
     
     rm(list = setdiff(ls(), c("path_results","smr1", "smr2")))
-    save.image(file = paste0(path_results,"/modelSmr.RData") )
+    
+    save(list = ls(envir = environment()), file = paste0(path_results,"/modelSmr.RData"), envir = environment())
+    #save.image(file = paste0(path_results,"/modelSmr.RData") )
     rm(list = ls())
 }

@@ -5,7 +5,7 @@ source("~/R-Project/mtDNA_mt2/Functions/RunSim.R")
 
 for(i in 1: nrow(df_var)){
     
-    for(j in 1: 4){
+    for(j in 1: 1){
         Sys.time()
         cat(paste("start c",i,"p",j))
         target_folder <- paste0("~/R-Project/mtDNA_mt2/Results","/","c",i,"p",j)

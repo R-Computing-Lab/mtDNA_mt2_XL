@@ -5,22 +5,23 @@ source("~/R-Project/mtDNA_mt2/Functions/RunSim.R")
 
 for(i in 1: nrow(df_var)){
     
-    for(j in 1: nrow(df_ped)){
-        
+    for(j in 1: 4){
+        Sys.time()
+        cat(paste("start c",i,"p",j))
         target_folder <- paste0("~/R-Project/mtDNA_mt2/Results","/","c",i,"p",j)
         if (!dir.exists(target_folder)){
             dir.create(target_folder)
-        } else {
-            
         }
+        # do.call(RunSim, as.list(df_var[i,],
+        #                         paste0("ped",j),
+        #                         target_folder))
         RunSim(Var = df_var[i,],
-               Ped = paste0("ped",j),
+               Ped = l_ped[[j]],
                path_results = target_folder )
+        Sys.time()
+        cat(paste("end c",i,"p",j))
     }
 }
 
-# dir.create(paste0("~/R-Project/mtDNA_mt2/Results","/","c1p1"))
-# path_save <- ""
-# RunSim(Var = df_var[1,],
-#        Ped = ped1,
-#        path_results = )
+
+

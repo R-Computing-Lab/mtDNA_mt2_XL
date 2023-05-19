@@ -9,44 +9,46 @@ RunSim <- function(Var, Ped, path_results){
     library(mvtnorm)
     
     Addmat <- as.matrix(ped2add(Ped, verbose = TRUE))
-    Nucmat <- ped2cn(sampleFam)
-    Extmat <- ped2ce(sampleFam)
-    Mtdmat <- ped2mt_v3(sampleFam)
+    Nucmat <- ped2cn(Ped)
+    Extmat <- ped2ce(Ped)
+    Mtdmat <- ped2mt_v3(Ped)
     Envmat <- diag(1,nrow = nrow(Addmat))
     dimnames(Envmat) <- dimnames(Addmat)
     Amimat <- Addmat*Mtdmat
     Dmgmat <- Addmat*Addmat
     
     #Var Comb
-    ad2 <- Var[2]
-    dd2 <- Var[3]
-    cn2 <- Var[4]
-    ce2 <- Var[5]
-    mt2 <- Var[6]
-    am2 <- Var[7]
-    ee2 <- Var[8]
+    ad2 <- Var[[2]]
+    #print(class(ad2))
+    dd2 <- Var[[3]]
+    cn2 <- Var[[4]]
+    ce2 <- Var[[5]]
+    mt2 <- Var[[6]]
+    am2 <- Var[[7]]
+    ee2 <- Var[[8]]
     
     ## generate data
-    sumCov <- ad2[comb]*Addmat + dd2[comb]*Addmat*Addmat + cn2[comb]*Nucmat + ce2[comb]*Extmat + mt2[comb]*Mtdmat + am2[comb]*Addmat*Mtdmat + ee2[comb]*Envmat
+    sumCov <- ad2*Addmat + dd2*Addmat*Addmat + cn2*Nucmat + ce2*Extmat + mt2*Mtdmat + am2*Addmat*Mtdmat + ee2*Envmat
     set.seed(14271)
     numfam <- round(10000/nrow(Addmat))
+    #print(class(numfam))
     dat <- rmvnorm(numfam, sigma = sumCov)
     
     totalVar <- 1
     totalMea <- 0
     
     ObjectsKeep <- as.character(ls())
-    
+    # "l_ped","df_var","i","j","target_folder"
     ## the full model
     Model1a <- mxModel(
         "ModelOne",
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ad2[comb]*totalVar, labels = "vad", name = "Vad", lbound = 1e-10),
-        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = dd2[comb]*totalVar, labels = "vdd", name = "Vdd", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = cn2[comb]*totalVar, labels = "vcn", name = "Vcn", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ce2[comb]*totalVar, labels = "vce", name = "Vce", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = mt2[comb]*totalVar, labels = "vmt", name = "Vmt", lbound = 1e-10),
-        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = am2[comb]*totalVar, labels = "vam", name = "Vam", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ee2[comb]*totalVar, labels = "ver", name = "Ver", lbound = 1e-10)
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ad2*totalVar, labels = "vad", name = "Vad", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = dd2*totalVar, labels = "vdd", name = "Vdd", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = cn2*totalVar, labels = "vcn", name = "Vcn", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ce2*totalVar, labels = "vce", name = "Vce", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = mt2*totalVar, labels = "vmt", name = "Vmt", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = am2*totalVar, labels = "vam", name = "Vam", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ee2*totalVar, labels = "ver", name = "Ver", lbound = 1e-10)
     )
     
     ll <- list()
@@ -99,13 +101,13 @@ RunSim <- function(Var, Ped, path_results){
     
     Model2a <- mxModel(
         "ModelThree",
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ad2[comb]*totalVar, labels = "vad", name = "Vad", lbound = 1e-10),
-        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = dd2[comb]*totalVar, labels = "vdd", name = "Vdd", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = cn2[comb]*totalVar, labels = "vcn", name = "Vcn", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ce2[comb]*totalVar, labels = "vce", name = "Vce", lbound = 1e-10),
-        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = mt2[comb]*totalVar, labels = "vmt", name = "Vmt", lbound = 1e-10),
-        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = am2[comb]*totalVar, labels = "vam", name = "Vam", lbound = 1e-10),
-        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ee2[comb]*totalVar, labels = "ver", name = "Ver", lbound = 1e-10)
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ad2*totalVar, labels = "vad", name = "Vad", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = dd2*totalVar, labels = "vdd", name = "Vdd", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = cn2*totalVar, labels = "vcn", name = "Vcn", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ce2*totalVar, labels = "vce", name = "Vce", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = mt2*totalVar, labels = "vmt", name = "Vmt", lbound = 1e-10),
+        #mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = am2*totalVar, labels = "vam", name = "Vam", lbound = 1e-10),
+        mxMatrix(type = "Full", nrow = 1, ncol = 1, free = TRUE, values = ee2*totalVar, labels = "ver", name = "Ver", lbound = 1e-10)
     )
     
     ll2 <- list()
@@ -150,5 +152,9 @@ RunSim <- function(Var, Ped, path_results){
     smr2 <- summary(containerRun2)
     
     save.image(file = paste0(path_results,"/model2.RData"))
-    rm(list = setdiff(ls(), c(ObjectsKeep,"ObjectsKeep", "smr1", "smr2")))
+    #rm(list = setdiff(ls(), c(ObjectsKeep,"ObjectsKeep", "smr1", "smr2")))
+    
+    rm(list = setdiff(ls(), c("path_results","smr1", "smr2")))
+    save.image(file = paste0(path_results,"/modelSmr.RData") )
+    rm(list = ls())
 }

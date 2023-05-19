@@ -9,6 +9,7 @@ df_var <- read.csv("~/R-Project/mtDNA_mt2/InitialData/VarianceComb.csv")
 
 set.seed(218)
 
+l_ped <- list()
 for(i in 1: nrow(df_ped)){
     ped_temp <- SimPed(kpc = df_ped$k[i],
                        Ngen = df_ped$G[i],
@@ -16,6 +17,8 @@ for(i in 1: nrow(df_ped)){
                        marR = df_ped$r[i])
     assign(paste0("ped",i),
            ped_temp)
+    l_ped[[i]] <- ped_temp
+    names(l_ped)[i] <- paste0("ped",i)
 }
 
 

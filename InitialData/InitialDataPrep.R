@@ -7,7 +7,7 @@ source("~/R-Project/mtDNA_mt2/Functions/SimPed.R")
 df_ped <- read.csv("~/R-Project/mtDNA_mt2/InitialData/Pedigrees.csv")
 df_var <- read.csv("~/R-Project/mtDNA_mt2/InitialData/VarianceComb.csv")
 
-set.seed(218)
+set.seed(62)
 
 l_ped <- list()
 for(i in 1: nrow(df_ped)){

@@ -3,7 +3,7 @@
 # Ped: A dataframe; selected pedigree structure
 # data_ini: a file path-the initializing Rdata file containing the pedigrees and variance combinations for simulation
 # path_results: a path of the folder indicating the place for storing the simulation results.
-RunSim <- function(Var, Ped, path_results){
+RunSim <- function(Var, Ped, n=10000, path_results){
     source("~/R-Project/mtDNA_mt2/Functions/HelperFunctions.R")
     library(OpenMx)
     library(mvtnorm)
@@ -30,7 +30,7 @@ RunSim <- function(Var, Ped, path_results){
     ## generate data
     sumCov <- ad2*Addmat + dd2*Addmat*Addmat + cn2*Nucmat + ce2*Extmat + mt2*Mtdmat + am2*Addmat*Mtdmat + ee2*Envmat
     set.seed(14271)
-    numfam <- round(10000/nrow(Addmat))
+    numfam <- round(n/nrow(Addmat))
     #print(class(numfam))
     dat <- rmvnorm(numfam, sigma = sumCov)
     
@@ -68,7 +68,7 @@ RunSim <- function(Var, Ped, path_results){
                                    mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Addmat, name="A"), 
                                    #mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Dmgmat, name="D"), 
                                    mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Nucmat, name="Cn"), 
-                                   mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Extmat, name="Ce"), 
+                                   #mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Extmat, name="Ce"), 
                                    #mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Amimat, name="Am"), 
                                    mxMatrix("Symm", nrow=fsize, ncol=fsize, values=Mtdmat, name="Mt"),
                                    mxData(observed = matrix(ll[[afam]], nrow=1, dimnames=list(NULL, ytemp)), type="raw", sort=FALSE),
@@ -129,7 +129,7 @@ RunSim <- function(Var, Ped, path_results){
                                      mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Addmat, name="A"), 
                                      #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Dmgmat, name="D"), 
                                      mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Nucmat, name="Cn"), 
-                                     mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Extmat, name="Ce"), 
+                                     #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Extmat, name="Ce"), 
                                      #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Amimat, name="Am"), 
                                      #mxMatrix("Symm", nrow=fsize2, ncol=fsize2, values=Mtdmat, name="Mt"),
                                      mxData(observed = matrix(ll2[[afam2]], nrow=1, dimnames=list(NULL, ytemp2)), type="raw", sort=FALSE),

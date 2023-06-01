@@ -3,12 +3,12 @@
 source("~/R-Project/mtDNA_mt2/InitialData/InitialDataPrep.R")
 source("~/R-Project/mtDNA_mt2/Functions/RunSim.R")
 
-for(i in 1: nrow(df_var)){
+for(i in 1: 11){
     
     for(j in 1: 10){
         print(Sys.time())
         cat(paste("start c",i,"p",j, "\n"))
-        target_folder <- paste0("~/R-Project/mtDNA_mt2/Results","/","c",i,"p",j)
+        target_folder <- paste0("~/R-Project/mtDNA_mt2/Result2","/","c",i,"p",j)
         if (!dir.exists(target_folder)){
             dir.create(target_folder)
         }

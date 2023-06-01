@@ -49,7 +49,7 @@ ped2add <- function(ped, max.gen=Inf, gen.only=FALSE, verbose=FALSE){
    iss <- unlist(parList)
    rm(parList, lens)
    #print(length(iss))
-   print(jss)
+   #print(jss)
    gc()
    isPar <- sparseMatrix(i=iss, j=jss, x=.5, dims=c(nr, nr), dimnames=list(ped$ID, ped$ID)) 
    if(verbose){cat('Completed first degree relatives (adjacency)\n')}

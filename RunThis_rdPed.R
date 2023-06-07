@@ -3,7 +3,7 @@
 source("~/R-Project/mtDNA_mt2/InitialData/InitialDataPrep_R2.R")
 source("~/R-Project/mtDNA_mt2/Functions/RunSim_rdped.R")
 
-for(i in 4){
+for(i in 1:11){
     
     for(j in 1: 10){
         print(Sys.time())

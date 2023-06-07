@@ -25,7 +25,7 @@ RunSim_rd <- function(Var, kpc, Ngen, sexR, marR, n=10000, path_results){
     dat <- data.frame()
     
     for(i in 1: numfam){
-        set.seed(i*11)
+        set.seed(i*12)
         ped_temp <- SimPed(kpc = kpc,
                            Ngen = Ngen,
                            sexR = sexR,
@@ -47,7 +47,7 @@ RunSim_rd <- function(Var, kpc, Ngen, sexR, marR, n=10000, path_results){
         #sumCov <- numeric()
         ## generate data
         sumCov <- ad2*Addmat + dd2*Addmat*Addmat + cn2*Nucmat + ce2*Extmat + mt2*Mtdmat + am2*Addmat*Mtdmat + ee2*Envmat
-        set.seed(i*11)
+        set.seed(i*12)
         #print(class(numfam))
         temp <- rmvnorm(1, sigma = sumCov)
         #print(temp)

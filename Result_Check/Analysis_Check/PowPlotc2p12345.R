@@ -118,7 +118,7 @@ g1 <-ggplot(data = df_c2)+ geom_line(mapping = aes(x = Nped, y = power, color= C
           legend.position=c(.8,.2))+
     xlab("n of Individuals")+
     scale_y_continuous(n.breaks = 6)+
-    ylab("Power (mt\u00B2+j\u00B2)")+
+    ylab("Power (mt\u00B2)")+
     geom_hline(yintercept = .8, linetype = 5, size = .8, color = "grey")
 # +
 # annotate(geom = "text",x = 0.62, y =.92, label = "a\u00B2 = .6", family="Calibri", color = "gray40",size = 3)+

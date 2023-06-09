@@ -96,7 +96,7 @@ g1 <-ggplot(data = df_p6)+ geom_line(mapping = aes(x = Nped, y = power, color= C
           legend.margin = margin(t=0,b=0,unit='pt'),
           legend.background = element_rect(),
           legend.position=c(.8,.2))+
-    xlab("N of Pedigrees")+
+    xlab("n of Pedigrees")+
     scale_y_continuous(n.breaks = 6)+
     ylab("Power (mt\u00B2)")+
     geom_hline(yintercept = .8, linetype = 5, size = .8, color = "grey")

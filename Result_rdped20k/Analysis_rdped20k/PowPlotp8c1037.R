@@ -12,7 +12,7 @@ warm_colors <-colorRampPalette(c("darkred", "lightsalmon", "#A6CE39"))(5)
 
 my_palette <- warm_colors
 
-demo_n <- 20000
+demo_n <- 10000
 
 ### create a new enviroment for one condition
 env_c7p8 <- new.env()
@@ -96,7 +96,7 @@ g1 <-ggplot(data = df_p8)+ geom_line(mapping = aes(x = Nped, y = power, color= C
           legend.margin = margin(t=0,b=0,unit='pt'),
           legend.background = element_rect(),
           legend.position=c(.8,.2))+
-    xlab("N of Pedigrees")+
+    xlab("n of Individuals")+
     scale_y_continuous(n.breaks = 6)+
     ylab("Power (mt\u00B2)")+
     geom_hline(yintercept = .8, linetype = 5, size = .8, color = "grey")

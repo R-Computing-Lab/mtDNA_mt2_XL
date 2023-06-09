@@ -16,7 +16,7 @@ ped4 <- SimPed(3,5)
 set.seed(5)
 ped5 <- SimPed(3,5)
 l_ped <- list(ped1, ped2, ped3, ped4, ped5)
-df_var <- read.csv("~/R-Project/mtDNA_mt2/InitialData/VarianceComb.csv")
+df_var <- read.csv("~/R-Project/mtDNA_mt2/InitialData/VarianceComb_a2mt2.csv")
 
 PlotPedigree(ped1)
 Wide2Long(ped1)
@@ -38,7 +38,7 @@ PlotPedigree(ped5)
 Wide2Long(ped5)
 write.csv(Wide2Long(ped5),"~/R-Project/mtDNA_mt2/Result_Check/Analysis_Check/ped5_long.csv" )
 
-for(i in 1: 5){
+for(i in 2){
     
     for(j in 1: 5){
         print(Sys.time())
@@ -50,7 +50,7 @@ for(i in 1: 5){
         # do.call(RunSim, as.list(df_var[i,],
         #                         paste0("ped",j),
         #                         target_folder))
-        RunSim(Var = df_var[i,],
+        RunSim_a2mt2e2only(Var = df_var[i,],
                Ped = l_ped[[j]],
                path_results = target_folder )
         print(Sys.time())

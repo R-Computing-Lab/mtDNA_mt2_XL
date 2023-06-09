@@ -6,7 +6,7 @@ powerCal <- function(lamda,df){
 }
 my_palette <- c( "#E41A1C", "#332288", "#E69F00", "#DDCC77", "#377EB8",  "#4DAF4A", "#117A65", "#56B4E9", "#A6CE39", "#A9A9A9","#88CCEE", "#CC6677",  "#AA4499",   "#999933", "#882255", "#984EA3")
 
-demo_n <- 2500
+demo_n <- 5000
 ### create a new enviroment for one condition
 env_c2p1 <- new.env()
 load("~/R-Project/mtDNA_mt2/Result_rdped_v2/c2p1/modelSmr.Rdata", envir = env_c2p1)
@@ -99,7 +99,7 @@ g1 <-ggplot(data = df_c2)+ geom_line(mapping = aes(x = Nped, y = power, color= C
           legend.margin = margin(t=0,b=0,unit='pt'),
           legend.background = element_rect(),
           legend.position=c(.8,.2))+
-    xlab("N of Individuals")+
+    xlab("n of Individuals")+
     scale_y_continuous(n.breaks = 6)+
     ylab("Power (mt\u00B2)")+
     geom_hline(yintercept = .8, linetype = 5, size = .8, color = "grey")

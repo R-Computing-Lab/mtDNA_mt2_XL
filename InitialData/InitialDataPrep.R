@@ -4,7 +4,7 @@ source("~/R-Project/mtDNA_mt2/Functions/evenInsert.R")
 source("~/R-Project/mtDNA_mt2/Functions/famSizeCal.R")
 source("~/R-Project/mtDNA_mt2/Functions/SimPed.R")
 
-df_ped <- read.csv("~/R-Project/mtDNA_mt2/InitialData/Pedigrees.csv")
+df_ped <- read.csv("~/R-Project/mtDNA_mt2/InitialData/Pedigrees_a2mt2.csv")
 df_var <- read.csv("~/R-Project/mtDNA_mt2/InitialData/VarianceComb.csv")
 
 set.seed(62)

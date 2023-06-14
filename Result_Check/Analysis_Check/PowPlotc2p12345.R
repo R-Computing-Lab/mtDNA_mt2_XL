@@ -1,9 +1,9 @@
 library(ggplot2)
 
-powerCal <- function(lamda,df){
-    1- pchisq(qchisq(1-.05, df), df, lamda)
-    
-}
+# powerCal <- function(lamda,df){
+#     1- pchisq(qchisq(1-.05, df), df, lamda)
+#     
+# }
 my_palette <- c( "#E41A1C", "#332288", "#E69F00", "#DDCC77", "#377EB8",  "#4DAF4A", "#117A65", "#56B4E9", "#A6CE39", "#A9A9A9","#88CCEE", "#CC6677",  "#AA4499",   "#999933", "#882255", "#984EA3")
 
 

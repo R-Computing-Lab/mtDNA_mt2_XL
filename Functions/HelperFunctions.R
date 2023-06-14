@@ -200,6 +200,36 @@ ped2mt_v3 <- function(ped, max.gen=Inf){
    r[r > 0] <- 1
    return(r)
 }
+# Custom CDF function for the mixed distribution
+p_mixed_chisq <- function(q, ncp=0) {
+    if (q < 0) {
+        return(0)
+    } else {
+        return(0.5 * pchisq(q, df=0, ncp=ncp) + 0.5 * pchisq(q, df=1, ncp=ncp))
+    }
+}
 
+
+# Custom quantile function for the mixed distribution under the null hypothesis
+q_mixed_chisq_null <- function(p) {
+    if (p <= 0.5) {
+        return(0)
+    } else {
+        return(qchisq(2 * (p - 0.5), df=1))
+    }
+}
+
+# Function to calculate the power
+powerCal <- function(lamda,df=1) {
+    # Critical value for alpha=0.05 based on null hypothesis (50% df=1 and 50% df=0)
+    critical_value <- q_mixed_chisq_null(1 - 0.05)
+    
+    # Probability of not rejecting the null hypothesis under the alternative hypothesis
+    prob_not_reject <- p_mixed_chisq(critical_value, ncp=lamda)
+    
+    # Power is 1 minus this probability
+    power <- 1 - prob_not_reject
+    return(power)
+}
 
 

@@ -1,9 +1,9 @@
 library(ggplot2)
 
-powerCal <- function(lamda,df){
-    1- pchisq(qchisq(1-.05, df), df, lamda)
-    
-}
+# powerCal <- function(lamda,df){
+#     1- pchisq(qchisq(1-.05, df), df, lamda)
+#     
+# }
 
 # Define warm colors
 warm_colors <-colorRampPalette(c("darkred", "lightsalmon", "#A6CE39"))(5)
